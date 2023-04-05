@@ -1,0 +1,68 @@
+name: Автоматическое тестирование и развертывание проекта
+
+#указываем, когда он будет срабатывать (при push или pull)
+on:
+  push:
+    branches: [cicl]
+
+#jobs - Выполняемые действия
+#tests - Имя дейсвтий
+#run-on - ОС на которой они будут выполняться (докер образ который нужно скачать)
+#env - ключи(их можно указываться в GitHub Secrets или явно в файле)
+    #services -
+    #postgres_main - имя сервиса
+    #image - образ постгресса
+    #env - обязательные переменные для постгреса(можно брать уже из вешесозданного вирт.окр.)
+    #port - открываем порт
+    #options: нужны, если происходят ошибки при подключении(будет несколько раз переподключаться)
+#        --health-cmd pg_isready -
+#        --health-interval 5s - раз в какое время будет переключаться
+#        --health-timeout 5s
+#        --health-retries 5 - количество попыток
+jobs:
+  tests:
+    run-on: ubuntu-20.04
+    env:
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      ALLOWED_HOSTS: ${{ secrets.ALLOWED_HOSTS }}
+      DB_ENGINE: ${{ secrets.DB_ENGINE }}
+      DB_HOST: ${{ secrets.DB_HOST }}
+      DB_NAME: ${{ secrets.DB_NAME }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      DB_PORT: ${{ secrets.DB_PORT }}
+      DB_USER: ${{ secrets.DB_USER }}
+      DEBUG: ${{ secrets.DEBUG }}
+    services:
+      postgres_main:
+        image: postgres:12
+        env:
+          POSTGRES_DB: ${{ env.DB_NAME }}
+          POSTGRES_USER: ${{ env.DB_USER }}
+          POSTGRES_PASSWORD: ${{ env.DB_PASSWORD }}
+        ports:
+          - 5432:5432
+        options:
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - name: Проверяем репозиторий на наличие изменений
+        uses: actions/checkout@v3
+
+      - name: Установить python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Установка зависимостей
+        run: pip install -r requirements.txt #если установить знак |, то можно перечислить несколько действий bash
+      - name: Линтинг #проверяет код на стандарты PEP8
+        run: flake8 measurement --exclude measurement/migrations
+      - name: Тестирование
+        run: python manage.py test
+#      - name: Деплой #Развертка на сервере
+#        uses:
+
+
+
+

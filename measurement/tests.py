@@ -1,3 +1,11 @@
-from django.test import TestCase
+from unittest import TestCase
 
-# Create your tests here.
+from rest_framework.test import APIClient
+
+
+class TestSampleView(TestCase):
+    def test_view(self):
+        client = APIClient()
+        response = client.get('/api/sensors/')
+        print(response)
+        assert 1 == 1
