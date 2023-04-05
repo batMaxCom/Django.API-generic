@@ -49,7 +49,6 @@ jobs:
     steps:
       - name: Проверяем репозиторий на наличие изменений
         uses: actions/checkout@v3
-
       - name: Установить python
         uses: actions/setup-python@v2
         with:
