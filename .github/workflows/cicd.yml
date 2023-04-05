@@ -21,7 +21,7 @@ on:
 #        --health-retries 5 - количество попыток
 jobs:
   tests:
-    run-on: ubuntu-20.04
+    runs-on: ubuntu-20.04
     env:
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
       ALLOWED_HOSTS: ${{ secrets.ALLOWED_HOSTS }}
